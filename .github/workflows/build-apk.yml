@@ -1,0 +1,49 @@
+name: Build APK
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Скачиваю код проекта
+        uses: actions/checkout@v4
+
+      - name: Устанавливаю Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Устанавливаю Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Настраиваю Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.4
+
+      - name: Собираю APK
+        run: gradle assembleDebug
+
+      - name: Выкладываю APK как файл для скачивания (Artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: RemoteMouse-apk
+          path: app/build/outputs/apk/debug/*.apk
+
+      - name: Публикую APK в Releases (постоянная ссылка на скачивание)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Remote Mouse (последняя сборка)
+          body: Автоматическая сборка. Скачай app-debug.apk ниже и установи на телефон.
+          files: app/build/outputs/apk/debug/*.apk
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
