@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         val btnAutoFind = findViewById<Button>(R.id.btnAutoFind)
         val tvStatus = findViewById<TextView>(R.id.tvStatus)
         val statusDot = findViewById<View>(R.id.statusDot)
+        val statusPanel = findViewById<LinearLayout>(R.id.statusPanel)
 
         // --- Тачпад ---
         val touchpad = findViewById<FrameLayout>(R.id.touchpad)
@@ -138,6 +139,7 @@ class MainActivity : AppCompatActivity() {
 
         // --- Медиа ---
         val btnMediaPrev = findViewById<Button>(R.id.btnMediaPrev)
+        val mediaCircleTrack = findViewById<FrameLayout>(R.id.mediaCircleTrack)
         val btnMediaPlayPause = findViewById<Button>(R.id.btnMediaPlayPause)
         val btnMediaNext = findViewById<Button>(R.id.btnMediaNext)
         val btnMediaStop = findViewById<Button>(R.id.btnMediaStop)
@@ -160,6 +162,8 @@ class MainActivity : AppCompatActivity() {
         val tvGyroSensitivityValue = findViewById<TextView>(R.id.tvGyroSensitivityValue)
         val seekGyroSensitivity = findViewById<SeekBar>(R.id.seekGyroSensitivity)
         val switchLeftHanded = findViewById<Switch>(R.id.switchLeftHanded)
+        val leftHandedPanel = findViewById<LinearLayout>(R.id.leftHandedPanel)
+        val gyroPanel = findViewById<LinearLayout>(R.id.gyroPanel)
         val switchGyro = findViewById<Switch>(R.id.switchGyro)
         val themeSwatchesContainer = findViewById<LinearLayout>(R.id.themeSwatchesContainer)
         val etCustomColor = findViewById<EditText>(R.id.etCustomColor)
