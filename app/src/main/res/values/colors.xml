@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_deep">#070B12</color>
+    <color name="bg_panel">#0E1826</color>
+    <color name="bg_panel_light">#152538</color>
+
+    <color name="cyan_primary">#00E5FF</color>
+    <color name="cyan_dim">#0F7A8C</color>
+    <color name="cyan_glow">#33F7FF</color>
+
+    <!-- Текст сделан заметно светлее для читаемости -->
+    <color name="text_primary">#EAF6FB</color>
+    <color name="text_secondary">#93B8CC</color>
+
+    <color name="status_online">#33FF99</color>
+    <color name="status_offline">#7A93A5</color>
+
+    <color name="danger">#FF4757</color>
+    <color name="danger_dim">#8A2E36</color>
+
+    <!-- Активное состояние (зажатая кнопка, выбранная вкладка) -->
+    <color name="accent_active">#FFC94A</color>
+    <color name="accent_active_dim">#8A6A1E</color>
+
+    <color name="tab_selected_bg">#173044</color>
+</resources>
