@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity() {
 
         // --- Медиа ---
         val btnMediaPrev = findViewById<Button>(R.id.btnMediaPrev)
-        val mediaCircleTrack = findViewById<FrameLayout>(R.id.mediaCircleTrack)
+        val mediaCard = findViewById<LinearLayout>(R.id.mediaCard)
         val btnMediaPlayPause = findViewById<Button>(R.id.btnMediaPlayPause)
         val btnMediaNext = findViewById<Button>(R.id.btnMediaNext)
         val btnMediaStop = findViewById<Button>(R.id.btnMediaStop)
@@ -601,7 +601,7 @@ class MainActivity : AppCompatActivity() {
             activeTheme = theme
             rootLayout.setBackgroundColor(theme.bgDeep)
 
-            listOf(statusPanel, leftHandedPanel, gyroPanel).forEach {
+            listOf(statusPanel, leftHandedPanel, gyroPanel, mediaCard).forEach {
                 it.background = themeDrawables.panel(theme)
             }
 
@@ -616,7 +616,7 @@ class MainActivity : AppCompatActivity() {
                 btnHkCopy, btnHkPaste, btnHkCut, btnHkUndo, btnHkRedo, btnHkSave, btnHkAltTab, btnHkWinD, btnHkAltF4,
                 btnBrowserBack, btnBrowserForward, btnBrowserRefresh, btnBrowserHome, btnBrowserNewTab, btnBrowserCloseTab,
                 btnBrowserZoomOut, btnBrowserZoomReset, btnBrowserZoomIn, btnSleep, btnRestart,
-                btnClipboardGet, btnClipboardSend
+                btnClipboardGet, btnClipboardSend, btnMediaStop
             )
             outlineNeutralButtons.forEach {
                 it.background = themeDrawables.outlineButton(theme)
@@ -636,19 +636,31 @@ class MainActivity : AppCompatActivity() {
                 it.background = themeDrawables.circleButton(theme)
                 it.setTextColor(theme.accent)
             }
-            listOf(btnMediaPrev, btnMediaNext, btnMute, btnMediaStop).forEach {
+            listOf(btnMediaPrev, btnMediaNext, btnMute).forEach {
                 it.background = themeDrawables.circleButton(theme)
                 it.setTextColor(theme.textPrimary)
             }
 
             touchpad.background = themeDrawables.touchpad(theme)
             scrollTrack.background = themeDrawables.scrollTrack(theme)
-            mediaCircleTrack.background = themeDrawables.circleTrack(theme)
 
             listOf(etIp, etPort, etKeyboard, etCustomColor).forEach {
                 it.background = themeDrawables.editText(theme)
                 it.setTextColor(theme.textPrimary)
                 it.setHintTextColor(theme.textSecondary)
+            }
+
+            // Switch и SeekBar - системные виджеты Android, у них своя подсветка
+            // (обычно системный синий), которую тема раньше не трогала
+            val accentState = android.content.res.ColorStateList.valueOf(theme.accent)
+            val accentDimState = android.content.res.ColorStateList.valueOf(theme.accentDim)
+            listOf(switchLeftHanded, switchGyro).forEach { sw ->
+                sw.thumbTintList = accentState
+                sw.trackTintList = accentDimState
+            }
+            listOf(seekSensitivity, seekScrollSpeed, seekGyroSensitivity).forEach { sb ->
+                sb.progressTintList = accentState
+                sb.thumbTintList = accentState
             }
 
             selectTab(currentTabIndex)
