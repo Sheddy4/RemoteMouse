@@ -59,7 +59,7 @@ class ThemeDrawables(private val density: Float) {
         )
         addState(
             intArrayOf(),
-            oval(theme.bgPanel, dp(1f), theme.accent)
+            oval(theme.bgPanelLight, dp(1f), theme.accent)
         )
     }
 

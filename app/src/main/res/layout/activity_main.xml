@@ -613,8 +613,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="24dp">
+                    android:layout_marginTop="10dp">
 
                     <EditText
                         android:id="@+id/etCustomColor"
@@ -624,7 +623,7 @@
                         android:background="@drawable/bg_edittext"
                         android:textColor="@color/text_primary"
                         android:textColorHint="@color/text_secondary"
-                        android:hint="#RRGGBB - свой цвет"
+                        android:hint="#RRGGBB - свой цвет темы"
                         android:inputType="text" />
 
                     <Button
@@ -636,6 +635,46 @@
                         android:textColor="@color/cyan_primary"
                         android:textAllCaps="false"
                         android:text="Применить" />
+                </LinearLayout>
+
+                <TextView style="@style/SectionLabel" android:text="ЦВЕТ КНОПОК (отдельно от темы)" android:layout_marginTop="20dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="24dp">
+
+                    <EditText
+                        android:id="@+id/etButtonColor"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_edittext"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_secondary"
+                        android:hint="#RRGGBB - цвет кнопок"
+                        android:inputType="text" />
+
+                    <Button
+                        android:id="@+id/btnApplyButtonColor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_button"
+                        android:textColor="@color/cyan_primary"
+                        android:textAllCaps="false"
+                        android:text="Применить" />
+
+                    <Button
+                        android:id="@+id/btnResetButtonColor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_button"
+                        android:textColor="@color/text_secondary"
+                        android:textAllCaps="false"
+                        android:text="Сброс" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>

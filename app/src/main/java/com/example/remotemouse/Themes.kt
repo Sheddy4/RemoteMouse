@@ -89,6 +89,13 @@ object Themes {
 
     val presets = listOf(CYAN, PURPLE, GREEN, ORANGE, RED, BLUE)
 
+    /** Приглушённый (для рамок/pressed-состояния) вариант произвольного цвета. */
+    fun dimVariant(color: Int): Int {
+        val hsv = FloatArray(3)
+        Color.colorToHSV(color, hsv)
+        return Color.HSVToColor(floatArrayOf(hsv[0], 0.55f, 0.45f))
+    }
+
     /** Строит тёмную тему на основе одного выбранного пользователем цвета. */
     fun buildCustom(accentColor: Int): AppTheme {
         val hsv = FloatArray(3)
@@ -102,7 +109,7 @@ object Themes {
             bgPanel = c(0.35f, 0.10f),
             bgPanelLight = c(0.35f, 0.15f),
             accent = accentColor,
-            accentDim = c(0.55f, 0.45f),
+            accentDim = dimVariant(accentColor),
             textPrimary = c(0.08f, 0.96f),
             textSecondary = c(0.20f, 0.75f)
         )

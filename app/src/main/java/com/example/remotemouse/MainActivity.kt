@@ -35,7 +35,14 @@ class MainActivity : AppCompatActivity() {
     private var scrollSpeed = 4.0f
     private lateinit var themeDrawables: ThemeDrawables
     private var activeTheme: AppTheme = Themes.CYAN
+    private var buttonAccentOverride: Int? = null
     private var currentTabIndex = 0
+
+    private fun buttonTheme(): AppTheme {
+        val accent = buttonAccentOverride ?: activeTheme.accent
+        val accentDim = buttonAccentOverride?.let { Themes.dimVariant(it) } ?: activeTheme.accentDim
+        return activeTheme.copy(accent = accent, accentDim = accentDim)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -168,6 +175,9 @@ class MainActivity : AppCompatActivity() {
         val themeSwatchesContainer = findViewById<LinearLayout>(R.id.themeSwatchesContainer)
         val etCustomColor = findViewById<EditText>(R.id.etCustomColor)
         val btnApplyCustomColor = findViewById<Button>(R.id.btnApplyCustomColor)
+        val etButtonColor = findViewById<EditText>(R.id.etButtonColor)
+        val btnApplyButtonColor = findViewById<Button>(R.id.btnApplyButtonColor)
+        val btnResetButtonColor = findViewById<Button>(R.id.btnResetButtonColor)
 
         scrollSpeed = 1.0f + seekScrollSpeed.progress * 0.1f
         touchpadGestures = TouchpadGestures(
@@ -248,7 +258,7 @@ class MainActivity : AppCompatActivity() {
                                 orientation = LinearLayout.HORIZONTAL
                                 gravity = Gravity.CENTER_VERTICAL
                                 setPadding(16, 20, 16, 20)
-                                background = themeDrawables.outlineButton(activeTheme)
+                                background = themeDrawables.outlineButton(buttonTheme())
                                 addView(icon)
                                 addView(label)
                                 setOnClickListener { newClient.focusApp(entry.title) }
@@ -345,7 +355,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 client?.mouseUp()
                 btnDrag.text = "Зажать"
-                btnDrag.background = themeDrawables.outlineButton(activeTheme)
+                btnDrag.background = themeDrawables.outlineButton(buttonTheme())
                 btnDrag.setTextColor(activeTheme.textPrimary)
             }
         }
@@ -520,7 +530,7 @@ class MainActivity : AppCompatActivity() {
                     orientation = LinearLayout.HORIZONTAL
                     gravity = Gravity.CENTER_VERTICAL
                     setPadding(16, 20, 16, 20)
-                    background = themeDrawables.outlineButton(activeTheme)
+                    background = themeDrawables.outlineButton(buttonTheme())
                     addView(label)
                     addView(delete)
                     setOnClickListener { onOpen(value) }
@@ -599,16 +609,22 @@ class MainActivity : AppCompatActivity() {
 
         fun applyTheme(theme: AppTheme) {
             activeTheme = theme
+            // Кнопки красятся отдельным цветом, если он задан - иначе тем же
+            // акцентом, что тачпад/вкладки/переключатели.
+            val btnAccent = buttonAccentOverride ?: theme.accent
+            val btnAccentDim = buttonAccentOverride?.let { Themes.dimVariant(it) } ?: theme.accentDim
+            val btnTheme = theme.copy(accent = btnAccent, accentDim = btnAccentDim)
+
             rootLayout.setBackgroundColor(theme.bgDeep)
 
             listOf(statusPanel, leftHandedPanel, gyroPanel, mediaCard).forEach {
                 it.background = themeDrawables.panel(theme)
             }
 
-            val outlineAccentButtons = listOf(btnConnect, btnAddLauncher, btnRefreshApps, btnAddBookmark, btnApplyCustomColor)
+            val outlineAccentButtons = listOf(btnConnect, btnAddLauncher, btnRefreshApps, btnAddBookmark, btnApplyCustomColor, btnApplyButtonColor, btnResetButtonColor)
             outlineAccentButtons.forEach {
-                it.background = themeDrawables.outlineButton(theme)
-                it.setTextColor(theme.accent)
+                it.background = themeDrawables.outlineButton(btnTheme)
+                it.setTextColor(btnAccent)
             }
 
             val outlineNeutralButtons = listOf(
@@ -619,32 +635,32 @@ class MainActivity : AppCompatActivity() {
                 btnClipboardGet, btnClipboardSend, btnMediaStop
             )
             outlineNeutralButtons.forEach {
-                it.background = themeDrawables.outlineButton(theme)
+                it.background = themeDrawables.outlineButton(btnTheme)
                 it.setTextColor(theme.textPrimary)
             }
 
             // Кнопка "Зажать" зависит от текущего состояния (зажата/нет)
-            btnDrag.background = if (dragHeld) themeDrawables.primaryButton(theme) else themeDrawables.outlineButton(theme)
+            btnDrag.background = if (dragHeld) themeDrawables.primaryButton(btnTheme) else themeDrawables.outlineButton(btnTheme)
             btnDrag.setTextColor(if (dragHeld) theme.bgDeep else theme.textPrimary)
 
             listOf(btnAutoFind, btnMediaPlayPause).forEach {
-                it.background = themeDrawables.primaryButton(theme)
+                it.background = themeDrawables.primaryButton(btnTheme)
                 it.setTextColor(theme.bgDeep)
             }
 
             listOf(btnVolUp, btnVolDown).forEach {
-                it.background = themeDrawables.circleButton(theme)
-                it.setTextColor(theme.accent)
+                it.background = themeDrawables.circleButton(btnTheme)
+                it.setTextColor(btnAccent)
             }
             listOf(btnMediaPrev, btnMediaNext, btnMute).forEach {
-                it.background = themeDrawables.circleButton(theme)
+                it.background = themeDrawables.circleButton(btnTheme)
                 it.setTextColor(theme.textPrimary)
             }
 
             touchpad.background = themeDrawables.touchpad(theme)
             scrollTrack.background = themeDrawables.scrollTrack(theme)
 
-            listOf(etIp, etPort, etKeyboard, etCustomColor).forEach {
+            listOf(etIp, etPort, etKeyboard, etCustomColor, etButtonColor).forEach {
                 it.background = themeDrawables.editText(theme)
                 it.setTextColor(theme.textPrimary)
                 it.setHintTextColor(theme.textSecondary)
@@ -711,6 +727,51 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        fun saveButtonColorOverride(hex: String?) {
+            val prefs = getSharedPreferences("remote_mouse_prefs", MODE_PRIVATE)
+            if (hex == null) {
+                prefs.edit().remove("button_accent_hex").apply()
+            } else {
+                prefs.edit().putString("button_accent_hex", hex).apply()
+            }
+        }
+        fun loadButtonColorOverride(): Int? {
+            val prefs = getSharedPreferences("remote_mouse_prefs", MODE_PRIVATE)
+            val hex = prefs.getString("button_accent_hex", null) ?: return null
+            return try {
+                android.graphics.Color.parseColor(hex)
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        btnApplyButtonColor.setOnClickListener {
+            val raw = etButtonColor.text.toString().trim()
+            if (raw.isEmpty()) {
+                Toast.makeText(this, "Введи цвет в формате #RRGGBB", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val hex = if (raw.startsWith("#")) raw else "#$raw"
+            val colorInt = try {
+                android.graphics.Color.parseColor(hex)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Некорректный цвет, формат #RRGGBB", Toast.LENGTH_SHORT).show()
+                null
+            }
+            if (colorInt != null) {
+                buttonAccentOverride = colorInt
+                saveButtonColorOverride(hex)
+                applyTheme(activeTheme)
+            }
+        }
+        btnResetButtonColor.setOnClickListener {
+            buttonAccentOverride = null
+            saveButtonColorOverride(null)
+            etButtonColor.setText("")
+            applyTheme(activeTheme)
+        }
+
+        buttonAccentOverride = loadButtonColorOverride()
         applyTheme(loadThemeChoice())
         rebuildSwatches()
 
