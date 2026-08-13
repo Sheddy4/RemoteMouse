@@ -1,2 +1,2 @@
-﻿rootProject.name = 'RemoteMouse'
+rootProject.name = 'RemoteMouse'
 include ':app'
