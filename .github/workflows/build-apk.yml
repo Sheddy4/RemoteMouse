@@ -1,11 +1,9 @@
-name: Build APK
+name: Build & Release APK
 
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:  # кнопка "запустить вручную" на GitHub
+  workflow_dispatch:
 
 jobs:
   build:
@@ -51,20 +49,41 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: RemoteMouse-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
-
-      - name: Get APK size
+      - name: Rename APK
         run: |
-          APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
-          SIZE=$(du -sh "$APK_PATH" | cut -f1)
-          echo "APK size: $SIZE"
-          echo "APK_SIZE=$SIZE" >> $GITHUB_STEP_SUMMARY
-          echo "### ✅ Build successful!" >> $GITHUB_STEP_SUMMARY
-          echo "**APK size:** $SIZE" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Download the APK from the **Artifacts** section above ⬆️" >> $GITHUB_STEP_SUMMARY
+          DATE=$(date +'%Y-%m-%d_%H-%M')
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          mv app/build/outputs/apk/debug/app-debug.apk \
+             app/build/outputs/apk/debug/RemoteMouse-${DATE}-${SHORT_SHA}.apk
+          echo "APK_NAME=RemoteMouse-${DATE}-${SHORT_SHA}.apk" >> $GITHUB_ENV
+          echo "RELEASE_TAG=build-${DATE}-${SHORT_SHA}" >> $GITHUB_ENV
+
+      - name: Delete old 'latest' release
+        uses: dev-drprasad/delete-tag-and-release@v1.1
+        with:
+          tag_name: latest
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          delete_release: true
+        continue-on-error: true  # не падать если релиза ещё нет
+
+      - name: Create Release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "🚀 Latest Build"
+          body: |
+            ### RemoteMouse — автосборка
+
+            **Коммит:** `${{ github.sha }}`
+            **Ветка:** `${{ github.ref_name }}`
+            **Дата:** ${{ github.event.head_commit.timestamp }}
+
+            ---
+            📱 **Скачай APK ниже** и установи на Android.
+            > Перед установкой разреши установку из неизвестных источников:
+            > Настройки → Безопасность → Неизвестные источники
+          files: app/build/outputs/apk/debug/${{ env.APK_NAME }}
+          prerelease: false
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
