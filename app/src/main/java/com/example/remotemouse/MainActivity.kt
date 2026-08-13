@@ -802,7 +802,7 @@ class MainActivity : AppCompatActivity() {
                         // ★ ФИКС БАГА: при смене пресета сбрасываем кастомный цвет кнопок,
                         // чтобы кнопки приняли цвет новой темы
                         buttonAccentOverride = null
-                        saveButtonColorOverride(null)
+                        prefs().edit().remove("button_accent_hex").apply()
                         etButtonColor.setText("")
 
                         saveThemeChoice(preset.id, null)
@@ -830,7 +830,7 @@ class MainActivity : AppCompatActivity() {
             if (colorInt != null) {
                 // ★ ФИКС: при кастомной теме тоже сбрасываем override кнопок
                 buttonAccentOverride = null
-                saveButtonColorOverride(null)
+                prefs().edit().remove("button_accent_hex").apply()
                 etButtonColor.setText("")
 
                 val theme = Themes.buildCustom(colorInt)
